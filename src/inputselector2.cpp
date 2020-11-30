@@ -37,7 +37,7 @@ bool InputSelector::setupInput(string filepath, bool jog)
     return false;
 }
 
-void InputSelector::toggleJog()
+bool InputSelector::toggleJog()
 {
     if(is_jog){
         cout<<"InputSelector: jog mode off\n";
@@ -48,6 +48,7 @@ void InputSelector::toggleJog()
         is_jog = true;
         if(type_flag == IS_TYPES::VID_FILE)vidPlayer.setPaused(true);
     }
+    return is_jog;
 }
 
 bool InputSelector::setupInput()

@@ -48,7 +48,7 @@ public:
     //+new use a video player with frame shuttle, default value so no refactoring
     bool setupInput(string filepath, bool shuttle=false);
     //+new only functions with player atm...maybe use for image sequence too
-    void toggleJog();
+    bool toggleJog();
     //+new set the grabber dimensions and deviceId
     bool setupInput(int w, int h, int deviceId=0);
     //call the update() on our IS_TYPE or moves to next frame
