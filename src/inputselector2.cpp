@@ -26,8 +26,8 @@ bool InputSelector::setupInput(string filepath, bool jog)
             //of_loop_palindrome causes critical GStreamer error
             vidPlayer.setLoopState(OF_LOOP_NORMAL);
             vidPlayer.setVolume(0.f);
-            is_jog = jog;
             vidPlayer.play();
+            if(toggleJog() != jog)toggleJog();
             return true;
         }
         cerr<<"InputSelector: could not load "<<filepath<<"\n";
@@ -58,6 +58,9 @@ bool InputSelector::setupInput()
 
 }
 
+/*
+ * need to add auto max resolution see https://forum.openframeworks.cc/t/list-available-webcam-resolutions/28420
+ */
 bool InputSelector::setupInput(int w, int h, int deviceId){
     if(type_flag == IS_TYPES::VID_DEVICE)
     {

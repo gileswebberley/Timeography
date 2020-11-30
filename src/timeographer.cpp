@@ -5,7 +5,9 @@ Timeographer::Timeographer(string filepath)
     cout<<"timeographer created for playback of "<<filepath<<"\n";
     vidIn.setType(IS_TYPES::VID_FILE);
     //+needs work, fails on every update somewhere...
-    if(vidIn.setupInput(filepath)){
+    if(vidIn.setupInput(filepath, true)){
+        //implemented frame by frame (jog) behaviour with true, if it's already on
+        //then it will turn it off hence doing it twice if so
         //I had forgotten this so the buffers were the wrong size...crashed repeatedly
         grabW = vidIn.getWidth();
         grabH = vidIn.getHeight();
@@ -72,12 +74,13 @@ void Timeographer::setExposure(int exp_t, int t_frames)
      * it a ridiculous task but want to capture decent
      * amounts of time...
      */
-    exp_t = (abs(exp_t)>300)?300:abs(exp_t);
-    t_frames = (abs(t_frames)>1000)?1000:abs(t_frames);
+    exp_t = (abs(exp_t)>300)?300:abs(exp_t);//10secs @ 30fps
+    t_frames = (abs(t_frames)>1000)?1000:abs(t_frames);//166mins (2hrs 46mins) @ 300exp_t
     exposure_time = exp_t;
-    time_frames = t_frames;
-    //trying to implement frame by frame
-    vidIn.toggleJog();
+    time_frames = t_frames;/*
+    //implemented frame by frame (jog) behaviour, if it's already on
+    //then it will turn it off hence doing it twice if so
+    if(!vidIn.toggleJog()) vidIn.toggleJog();*/
     //a flag to know if it's already set for the next exposure...
     recording = true;
 }
