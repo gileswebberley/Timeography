@@ -24,11 +24,6 @@ void ofApp::setup(){
                 ** use up to 120ish for low contrast images, otherwise about 10
 */
                 //timeography->setupDifference(30,true);
-                /* (exp_t, t_frames) exp_t is how many video frames make up each
-                 * exposure, whilst t_frames is how many of those exposures will
-                 * be blended to make up the final timeograph
-                 */
-//                timeography->setExposure(60,17);//moved to expGoButtonPressed
                 exposure_settings.setup("Exposure Settings");
                 exposure_settings.add(exposure_time.setup("exposure time",30,1,300,300,20));
                 exposure_settings.add(exposure_number.setup("frame count",100,1,1000,300,20));
@@ -65,21 +60,25 @@ void ofApp::exit(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    if(is_exp_go){
     //shutterRelease returns true whilst it is 'recording'
-    if(!timeography->shutterRelease() && is_exp_go){
+    if(!timeography->shutterRelease()){
         cout<<"ofApp::update shutter release\n";
         timeography->shutterRelease();
         is_exp_go = false;
+    }
     }
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     //ofSetColor(255);
-
+    if(timeography->isReady()){
+        timeography->drawExposure();
+        show_gui = true;
+    }
     if(show_gui){
         exposure_settings.draw();
-        if(timeography->isReady())timeography->drawExposure();
     }else{
         timeography->drawInput(true);
     }
