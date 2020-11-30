@@ -130,7 +130,6 @@ bool Timeographer::shutterRelease()
         //we have done our stuff with a new frame
         return true;
     }//end if recording
-    //if(!recording)recording=true;//this doesn't make sense
     //we are not recording
     return false;
 }
@@ -317,10 +316,14 @@ void Timeographer::makeFrame()
                 //timeograph[indexIn+rgb] += comp/time_frames;
                 if(comp > 0.0){
                 //adding long exposure to timeograph
-                timeograph[indexIn+rgb] += timeoframe[indexIn+rgb]/(time_frames);
+                //timeograph[indexIn+rgb] += (double)timeoframe[indexIn+rgb]/(time_frames);
+                //try to soften the effect
+                timeograph[indexIn+rgb] += (double)comp/(time_frames);
                 }else{
                     //subtracting long exposure to timeograph
-                    timeograph[indexIn+rgb] -= timeoframe[indexIn+rgb]/(time_frames);
+                    //timeograph[indexIn+rgb] -= (double)timeoframe[indexIn+rgb]/(time_frames);
+                    //try to soften the effect
+                    timeograph[indexIn+rgb] -= (double)abs(comp)/(time_frames);
                 }
                 //clear the long exposure
                 timeoframe[indexIn+rgb] = 0.f;
@@ -341,7 +344,7 @@ void Timeographer::makeTimeograph()
             int rgb = 0;
             while(rgb<3){
                 //create timeograph by rounding from dbl to int
-                buff[indexIn+rgb] = round(timeograph[indexIn+rgb]);
+                buff[indexIn+rgb] = (int)floor(timeograph[indexIn+rgb]);
                 //clear the timeograph and frame data
                 timeoframe[indexIn+rgb] = 0.f;
                 timeograph[indexIn+rgb] = 0.f;
