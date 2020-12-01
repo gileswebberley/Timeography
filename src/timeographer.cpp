@@ -144,8 +144,9 @@ bool Timeographer::saveAsJpeg(string filename)
         ofFileDialogResult saveDirResult = ofSystemLoadDialog("Select a folder to save your Timeograph", true);
         if (saveDirResult.bSuccess){
             texOut.readToPixels(photo);
-            //this "/" won't work in windows, is there a way to get a localised version?
-            return photo.save(saveDirResult.filePath+"/"+filename+".jpg",OF_IMAGE_QUALITY_HIGH);
+            //this "/" won't work in windows, is there a way to get a localised version? YES??
+            string dir_path{ofFilePath::addTrailingSlash(saveDirResult.filePath)};
+            return photo.save(dir_path+filename+".jpg",OF_IMAGE_QUALITY_HIGH);
         }
     }
     return false;
