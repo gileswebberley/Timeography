@@ -143,7 +143,14 @@ bool Timeographer::saveAsJpeg(string filename)
         cout<<"save file as "<<filename<<".jpg\n";
         ofFileDialogResult saveDirResult = ofSystemLoadDialog("Select a folder to save your Timeograph", true);
         if (saveDirResult.bSuccess){
-            texOut.readToPixels(photo);
+            //implemented scaling with interpolation
+            ofPixels tmpResize;
+            //copy pixels from graphics card to an ofPixels temp variable
+            texOut.readToPixels(tmpResize);
+            //the ofPixels resize() allows the interpolation argument
+            tmpResize.resize(texOut.getWidth()*2,texOut.getHeight()*2,OF_INTERPOLATE_NEAREST_NEIGHBOR);
+            //then an ofImage to allow for the save()
+            photo.setFromPixels(tmpResize);
             //this "/" won't work in windows, is there a way to get a localised version? YES??
             string dir_path{ofFilePath::addTrailingSlash(saveDirResult.filePath)};
             return photo.save(dir_path+filename+".jpg",OF_IMAGE_QUALITY_HIGH);
