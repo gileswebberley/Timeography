@@ -15,19 +15,18 @@ void ofApp::setup(){
         //cerate ofFile from the selected
         ofFile tmpFile(open_result.getPath());
         if(tmpFile.exists()){
-            cout<<tmpFile.getFileName()<<" is being set up as source of Timeographer\n";
             string tmpExt = ofToLower(tmpFile.getExtension());
             if(tmpExt == "mp4" || tmpExt == "mov"){
+                //getBaseName actually gets the name stripped of extension eg "file.jpg"->"file"
+                original_name = tmpFile.getBaseName();
+                cout<<original_name<<" is being set up as source of Timeographer\n";
                 //as it is set to jog it should pause until exposure is set
                 timeography = new Timeographer{tmpFile.path()};
                 /*use for diff style timeograph or comment out for normal mode
                 ** use up to 120ish for low contrast images, otherwise about 10
 */
                 //timeography->setupDifference(30,true);
-                exposure_settings.setup("Exposure Settings");
-                exposure_settings.add(exposure_time.setup("exposure time",30,1,300,300,20));
-                exposure_settings.add(exposure_number.setup("frame count",100,1,1000,300,20));
-                exposure_settings.add(exposure_go_button.setup("Run"));
+                makeExposureGui();
             }else{
                 cerr<<"selected file was not of a type allowable ie mp4 or mov\n";
             }
@@ -44,12 +43,21 @@ void ofApp::setup(){
     cout<<"...SETUP COMPLETE\n";
 }
 
+void ofApp::makeExposureGui(){
+    exposure_settings.setup("Exposure Settings");
+    exposure_settings.add(exposure_time.setup("exposure time",30,1,300,300,20));
+    exposure_settings.add(exposure_number.setup("frame count",100,1,1000,300,20));
+    exposure_settings.add(exposure_go_button.setup("Run"));
+}
+
 void ofApp::expGoButtonPressed(){
     /* (exp_t, t_frames) exp_t is how many video frames make up each
      * exposure, whilst t_frames is how many of those exposures will
      * be blended to make up the final timeograph
      */
-    timeography->setExposure(exposure_time,exposure_number);
+    orig_exp_t = exposure_time;//need to extract for naming but can't find the int value to make string
+    orig_exp_n = exposure_number;
+    timeography->setExposure(orig_exp_t,orig_exp_n);
     is_exp_go = true;
     show_gui = false;
 }
@@ -89,7 +97,7 @@ void ofApp::keyPressed(int key){
     //press space-bar to save the current timeograph
     if(key == ' '){
         //returns false if it's not ready
-        timeography->saveAsJpeg("timeograph"+ofGetTimestampString());
+        timeography->saveAsJpeg("tm-"+original_name+"-"+ofGetTimestampString());
     }/*
        little experiment to manually take frames...
 else if(key == OF_KEY_RETURN){

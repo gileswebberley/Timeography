@@ -11,6 +11,11 @@ class ofApp : public ofBaseApp{
     int grabW{640}, grabH{480};
     //create new in setup()
     Timeographer* timeography;
+    /*add in the name of the loaded video
+     *so it can be used for saving
+     */
+    string original_name;
+    int orig_exp_t, orig_exp_n;
     //expressionsTrack* tracker;
     //so we're adding a gui, wish me luck
     //just for original mode and file input atm
@@ -20,6 +25,7 @@ class ofApp : public ofBaseApp{
     bool is_exp_go{false};
     ofxPanel exposure_settings;
     bool show_gui{true};
+    void makeExposureGui();
 
 public:
     void setup();
