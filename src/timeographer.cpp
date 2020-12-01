@@ -140,8 +140,13 @@ bool Timeographer::saveAsJpeg(string filename)
 {
     if(isReady())
     {
-        texOut.readToPixels(photo);
-        return photo.save(filename+".jpg",OF_IMAGE_QUALITY_HIGH);
+        cout<<"save file as "<<filename<<".jpg\n";
+        ofFileDialogResult saveDirResult = ofSystemLoadDialog("Select a folder to save your Timeograph", true);
+        if (saveDirResult.bSuccess){
+            texOut.readToPixels(photo);
+            //this "/" won't work in windows, is there a way to get a localised version?
+            return photo.save(saveDirResult.filePath+"/"+filename+".jpg",OF_IMAGE_QUALITY_HIGH);
+        }
     }
     return false;
 }
