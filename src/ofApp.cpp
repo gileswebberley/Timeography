@@ -55,11 +55,11 @@ void ofApp::makeExposureGui(){
     load_video_button.addListener(this, &ofApp::loadVidButtonPressed);
     ofColor bgc{ofColor(42,82,4)};
     ofColor bgtc{ofColor(217,245,191)};
-    ofColor bgfc{ofColor(98,171,38)};
+    ofColor bgfc{ofColor::teal};//bgfc{ofColor(98,171,38)};
     //setting default colours does not influence the contained widgets :(
     exposure_settings.setDefaultWidth(500);
     exposure_settings.setDefaultHeight(30);
-    exposure_settings.setup("Exposure Settings");
+    exposure_settings.setup("EXPOSURE SETTINGS");
     exposure_settings.setHeaderBackgroundColor(ofColor::teal);
     exposure_settings.setTextColor(ofColor::ivory);
     load_video_button.setBackgroundColor(bgc);
@@ -72,9 +72,10 @@ void ofApp::makeExposureGui(){
     exposure_number.setFillColor(bgfc);
     exposure_number.setBackgroundColor(bgc);
     exposure_number.setTextColor(bgtc);
-    exposure_settings.add(load_video_button.setup("Click to select input file (mp4 or mov)"));
-    exposure_settings.add(exposure_time.setup("exposure time",30,1,300,300));
-    exposure_settings.add(exposure_number.setup("frame count",10,1,1000));
+    //exposure_settings.add(exp_information.setup(how_to,500,300));
+    exposure_settings.add(load_video_button.setup("Click to select input file (MP4 or MOV only)"));
+    exposure_settings.add(exposure_time.setup("EXPOSURE TIME (blur 30 = 1sec)",30,1,300,300));
+    exposure_settings.add(exposure_number.setup("FRAME COUNT (blend exposures)",10,1,1000));
     exposure_settings.add(exposure_go_button.setup("Click the box to Run Timeographer"));
 }
 
@@ -85,10 +86,8 @@ void ofApp::expGoButtonPressed(){
      * exposure, whilst t_frames is how many of those exposures will
      * be blended to make up the final timeograph
      */
-    orig_exp_t = exposure_time;//need to extract for naming but can't find the int value to make string
-    orig_exp_n = exposure_number;
     if(timeography != nullptr){
-        timeography->setExposure(orig_exp_t,orig_exp_n);
+        timeography->setExposure(exposure_time,exposure_number);
         is_exp_go = true;
         show_gui = false;
     }
@@ -125,6 +124,20 @@ void ofApp::draw(){
     }
     if(show_gui){
         exposure_settings.draw();
+
+        string how_to =
+        "Simply select a video source file first, remembering that you\n"
+        "can only use either mp4 or mov formats.\n"
+        "Now use the sliders to set the exposure time, which is kinda\n"
+        "how blurry each 'frame' is, and the frame count, which is how\n"
+        "many exposures are blended into the final Timeograph.\n"
+        "I recommend an exp_t [3..30] and t_frames can be worked out\n"
+        "as (length in secs*30)/exp_t.\n At this point you can set it\n"
+        "running and check the progress via the information at the\n"
+        "bottom left of screen.\n"
+        "If you're happy with the result then just hit the spacebar\n"
+        "to save it to a location of your choosing.";
+        ofDrawBitmapString(how_to,13,exposure_settings.getHeight()+30);
     }else{
         timeography->drawInput(true);
     }

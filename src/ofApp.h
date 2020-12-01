@@ -2,8 +2,6 @@
 
 #include "ofMain.h"
 #include "timeographer.h"
-//#include "expressionstrack.h"
-#include "ofxOpenCv.h"
 #include "ofxGui.h"
 
 class ofApp : public ofBaseApp{
@@ -15,8 +13,6 @@ class ofApp : public ofBaseApp{
      *so it can be used for saving
      */
     string original_name;
-    int orig_exp_t, orig_exp_n;
-    //expressionsTrack* tracker;
     //so we're adding a gui, wish me luck
     //just for original mode and file input atm
     ofxIntSlider exposure_time, exposure_number;

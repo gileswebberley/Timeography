@@ -140,7 +140,6 @@ bool Timeographer::saveAsJpeg(string filename)
 {
     if(isReady())
     {
-        cout<<"save file as "<<filename<<".jpg\n";
         ofFileDialogResult saveDirResult = ofSystemLoadDialog("Select a folder to save your Timeograph", true);
         if (saveDirResult.bSuccess){
             filename += " exp_t";
@@ -148,6 +147,7 @@ bool Timeographer::saveAsJpeg(string filename)
             filename += " exp_c";
             filename += to_string(time_frames);
             filename += ".jpg";
+            cout<<"save file as "<<filename<<"\n";
             //implemented scaling with interpolation
             ofPixels tmpResize;
             //copy pixels from graphics card to an ofPixels temp variable
