@@ -9,8 +9,8 @@
 class ofApp : public ofBaseApp{
 
     int grabW{640}, grabH{480};
-    //create new in setup()
-    Timeographer* timeography;
+    //create new in setup() set to nullPtr for initialisation/instansiation thing
+    Timeographer* timeography{nullptr};
     /*add in the name of the loaded video
      *so it can be used for saving
      */
@@ -21,11 +21,13 @@ class ofApp : public ofBaseApp{
     //just for original mode and file input atm
     ofxIntSlider exposure_time, exposure_number;
     //a button to set things off and running
-    ofxButton exposure_go_button;
-    bool is_exp_go{false};
+    ofxButton exposure_go_button,load_video_button;
     ofxPanel exposure_settings;
-    bool show_gui{true};
+    //flags for flow control
+    bool show_gui{true}, is_exp_go{false};
+
     void makeExposureGui();
+    bool openAndCreateFileTimeographer();
 
 public:
     void setup();
@@ -34,5 +36,7 @@ public:
     void exit() override;
 
     void keyPressed(int key);
+    //listener methods
     void expGoButtonPressed();
+    void loadVidButtonPressed();
 };

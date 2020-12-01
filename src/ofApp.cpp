@@ -3,12 +3,17 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     cout<<"IN SETUP....\n";
-    //set up listeners for gui, remove in exit()
-    exposure_go_button.addListener(this, &ofApp::expGoButtonPressed);
     //Of looks after these pointers, right? Valgrind finds nothing
     //{grabW, grabH, deviceId} for webcam...
     //timeography = new Timeographer{640,480,0};
-    //make gui selection for the video file
+    ofSetFrameRate(30);
+    ofSetVerticalSync(true);
+    makeExposureGui();
+    //if(openAndCreateFileTimeographer()) cout<<"...SETUP COMPLETE\n";
+}
+
+bool ofApp::openAndCreateFileTimeographer(){
+    //make system selection for the video file
     ofFileDialogResult open_result = ofSystemLoadDialog("Select an mp4 or mov as Timeograph source");
     if(open_result.bSuccess){
         //if a file was selected
@@ -20,35 +25,42 @@ void ofApp::setup(){
                 //getBaseName actually gets the name stripped of extension eg "file.jpg"->"file"
                 original_name = tmpFile.getBaseName();
                 cout<<original_name<<" is being set up as source of Timeographer\n";
-                //as it is set to jog it should pause until exposure is set
+                if(timeography != nullptr) timeography = nullptr;
+                //does that clear up?? seems to be working acc. to valgrind check?
                 timeography = new Timeographer{tmpFile.path()};
+                //as it is set to jog it should pause until exposure is set
                 /*use for diff style timeograph or comment out for normal mode
                 ** use up to 120ish for low contrast images, otherwise about 10
 */
                 //timeography->setupDifference(30,true);
-                makeExposureGui();
+
+                return true;
             }else{
                 cerr<<"selected file was not of a type allowable ie mp4 or mov\n";
+                return false;
             }
         }else{
             cerr<<"File selected does not exist\n";
+            return false;
         }
     }else{
         cerr<<"Failed to select a file\n";
+        return false;
     }
-    //{fiespath} for video file
-//    timeography = new Timeographer{"ed_portrait.mp4"};
-    ofSetFrameRate(30);
-    ofSetVerticalSync(true);
-    cout<<"...SETUP COMPLETE\n";
 }
 
 void ofApp::makeExposureGui(){
+    //set up listeners for gui, remove in exit()
+    exposure_go_button.addListener(this, &ofApp::expGoButtonPressed);
+    load_video_button.addListener(this, &ofApp::loadVidButtonPressed);
     exposure_settings.setup("Exposure Settings");
+    exposure_settings.add(load_video_button.setup("Click to select input file (mp4 or mov)"));
     exposure_settings.add(exposure_time.setup("exposure time",30,1,300,300,20));
-    exposure_settings.add(exposure_number.setup("frame count",100,1,1000,300,20));
-    exposure_settings.add(exposure_go_button.setup("Run"));
+    exposure_settings.add(exposure_number.setup("frame count",10,1,1000,500,20));
+    exposure_settings.add(exposure_go_button.setup("Click the box to Run Timeographer"));
 }
+
+//listener methods
 
 void ofApp::expGoButtonPressed(){
     /* (exp_t, t_frames) exp_t is how many video frames make up each
@@ -57,9 +69,15 @@ void ofApp::expGoButtonPressed(){
      */
     orig_exp_t = exposure_time;//need to extract for naming but can't find the int value to make string
     orig_exp_n = exposure_number;
-    timeography->setExposure(orig_exp_t,orig_exp_n);
-    is_exp_go = true;
-    show_gui = false;
+    if(timeography != nullptr){
+        timeography->setExposure(orig_exp_t,orig_exp_n);
+        is_exp_go = true;
+        show_gui = false;
+    }
+}
+
+void ofApp::loadVidButtonPressed(){
+    if(show_gui) openAndCreateFileTimeographer();
 }
 
 void ofApp::exit(){
@@ -81,9 +99,11 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     //ofSetColor(255);
+    if(timeography != nullptr){
     if(timeography->isReady()){
         timeography->drawExposure();
         show_gui = true;
+    }
     }
     if(show_gui){
         exposure_settings.draw();
@@ -98,11 +118,5 @@ void ofApp::keyPressed(int key){
     if(key == ' '){
         //returns false if it's not ready
         timeography->saveAsJpeg("tm-"+original_name+"-"+ofGetTimestampString());
-    }/*
-       little experiment to manually take frames...
-else if(key == OF_KEY_RETURN){
-        if(!timeography->shutterRelease()){
-            timeography->shutterRelease();
-        }
-    }*/
+    }
 }
