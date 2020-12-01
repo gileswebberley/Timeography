@@ -53,10 +53,28 @@ void ofApp::makeExposureGui(){
     //set up listeners for gui, remove in exit()
     exposure_go_button.addListener(this, &ofApp::expGoButtonPressed);
     load_video_button.addListener(this, &ofApp::loadVidButtonPressed);
+    ofColor bgc{ofColor(42,82,4)};
+    ofColor bgtc{ofColor(217,245,191)};
+    ofColor bgfc{ofColor(98,171,38)};
+    //setting default colours does not influence the contained widgets :(
+    exposure_settings.setDefaultWidth(500);
+    exposure_settings.setDefaultHeight(30);
     exposure_settings.setup("Exposure Settings");
+    exposure_settings.setHeaderBackgroundColor(ofColor::teal);
+    exposure_settings.setTextColor(ofColor::ivory);
+    load_video_button.setBackgroundColor(bgc);
+    load_video_button.setTextColor(bgtc);
+    exposure_go_button.setBackgroundColor(bgc);
+    exposure_go_button.setTextColor(bgtc);
+    exposure_time.setFillColor(bgfc);
+    exposure_time.setBackgroundColor(bgc);
+    exposure_time.setTextColor(bgtc);
+    exposure_number.setFillColor(bgfc);
+    exposure_number.setBackgroundColor(bgc);
+    exposure_number.setTextColor(bgtc);
     exposure_settings.add(load_video_button.setup("Click to select input file (mp4 or mov)"));
-    exposure_settings.add(exposure_time.setup("exposure time",30,1,300,300,20));
-    exposure_settings.add(exposure_number.setup("frame count",10,1,1000,500,20));
+    exposure_settings.add(exposure_time.setup("exposure time",30,1,300,300));
+    exposure_settings.add(exposure_number.setup("frame count",10,1,1000));
     exposure_settings.add(exposure_go_button.setup("Click the box to Run Timeographer"));
 }
 
