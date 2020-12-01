@@ -15,12 +15,13 @@ class ofApp : public ofBaseApp{
     string original_name;
     //so we're adding a gui, wish me luck
     //just for original mode and file input atm
-    ofxIntSlider exposure_time, exposure_number;
+    ofxIntSlider exposure_time, exposure_number,difference_threshold;
     //a button to set things off and running
     ofxButton exposure_go_button,load_video_button;
+    ofxToggle diff_mode_toggle;
     ofxPanel exposure_settings;
     //flags for flow control
-    bool show_gui{true}, is_exp_go{false};
+    bool show_gui{true}, is_exp_go{false}, is_diff_mode{false};
 
     void makeExposureGui();
     bool openAndCreateFileTimeographer();
@@ -35,4 +36,5 @@ public:
     //listener methods
     void expGoButtonPressed();
     void loadVidButtonPressed();
+    void diffToggled(bool&);
 };

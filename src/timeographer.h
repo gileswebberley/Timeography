@@ -101,6 +101,8 @@ public:
     //for the difference version....
     //diff_threshold [1..255]
     void setupDifference(int diff_threshold=10, bool outline=false);
+    //returns true if it's able to clear up
+    bool clearDifference();
 };
 
 #endif // TIMEOGRAPHER_H

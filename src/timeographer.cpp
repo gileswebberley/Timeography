@@ -209,6 +209,15 @@ void Timeographer::setupDifference(int d_t, bool outline)
     do_outline = outline;
 }
 
+bool Timeographer::clearDifference(){
+    if(recording) return false;
+    if(diff_mode || difference_learn) delete [] diffMap;
+    difference_learn = false;
+    diff_mode = false;
+    do_outline = false;
+    return true;
+}
+
 //private method for the first frame whilst in difference mode
 void Timeographer::learnDifference()
 {

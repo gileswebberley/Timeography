@@ -9,7 +9,7 @@ void ofApp::setup(){
     ofSetFrameRate(30);
     ofSetVerticalSync(true);
     makeExposureGui();
-    //if(openAndCreateFileTimeographer()) cout<<"...SETUP COMPLETE\n";
+    cout<<"...SETUP COMPLETE\n";
 }
 
 bool ofApp::openAndCreateFileTimeographer(){
@@ -29,10 +29,6 @@ bool ofApp::openAndCreateFileTimeographer(){
                 //does that clear up?? seems to be working acc. to valgrind check?
                 timeography = new Timeographer{tmpFile.path()};
                 //as it is set to jog it should pause until exposure is set
-                /*use for diff style timeograph or comment out for normal mode
-                ** use up to 120ish for low contrast images, otherwise about 10
-*/
-                //timeography->setupDifference(30,true);
 
                 return true;
             }else{
@@ -53,9 +49,10 @@ void ofApp::makeExposureGui(){
     //set up listeners for gui, remove in exit()
     exposure_go_button.addListener(this, &ofApp::expGoButtonPressed);
     load_video_button.addListener(this, &ofApp::loadVidButtonPressed);
+    diff_mode_toggle.addListener(this, &ofApp::diffToggled);
     ofColor bgc{ofColor(42,82,4)};
     ofColor bgtc{ofColor(217,245,191)};
-    ofColor bgfc{ofColor::teal};//bgfc{ofColor(98,171,38)};
+    ofColor bgfc{ofColor::teal};
     //setting default colours does not influence the contained widgets :(
     exposure_settings.setDefaultWidth(500);
     exposure_settings.setDefaultHeight(30);
@@ -72,8 +69,15 @@ void ofApp::makeExposureGui(){
     exposure_number.setFillColor(bgfc);
     exposure_number.setBackgroundColor(bgc);
     exposure_number.setTextColor(bgtc);
-    //exposure_settings.add(exp_information.setup(how_to,500,300));
+    difference_threshold.setFillColor(bgfc);
+    difference_threshold.setBackgroundColor(bgc);
+    difference_threshold.setTextColor(bgtc);
+    diff_mode_toggle.setFillColor(bgfc);
+    diff_mode_toggle.setBackgroundColor(bgc);
+    diff_mode_toggle.setTextColor(bgtc);
     exposure_settings.add(load_video_button.setup("Click to select input file (MP4 or MOV only)"));
+    exposure_settings.add(diff_mode_toggle.setup("Set to use Difference Mode",false));
+    exposure_settings.add(difference_threshold.setup("Difference (set high for low contrast)",10,1,200));
     exposure_settings.add(exposure_time.setup("EXPOSURE TIME (blur 30 = 1sec)",30,1,300,300));
     exposure_settings.add(exposure_number.setup("FRAME COUNT (blend exposures)",10,1,1000));
     exposure_settings.add(exposure_go_button.setup("Click the box to Run Timeographer"));
@@ -87,6 +91,13 @@ void ofApp::expGoButtonPressed(){
      * be blended to make up the final timeograph
      */
     if(timeography != nullptr){
+        //timeography->clearDifference();
+        if(is_diff_mode){
+        /*use for diff style timeograph or comment out for normal mode
+        ** use up to 120ish for low contrast images, otherwise about 10
+false is bool for outline renedering*/
+        timeography->setupDifference(difference_threshold,false);
+        }
         timeography->setExposure(exposure_time,exposure_number);
         is_exp_go = true;
         show_gui = false;
@@ -97,8 +108,17 @@ void ofApp::loadVidButtonPressed(){
     if(show_gui) openAndCreateFileTimeographer();
 }
 
+void ofApp::diffToggled(bool& val){
+    cout<<"Difference Mode is "<<val<<"\n";
+    if(val != is_diff_mode){
+    is_diff_mode = val;
+    if(!val && timeography != nullptr) timeography->clearDifference();
+    }
+}
 void ofApp::exit(){
     exposure_go_button.removeListener(this, &ofApp::expGoButtonPressed);
+    load_video_button.removeListener(this, &ofApp::loadVidButtonPressed);
+    diff_mode_toggle.removeListener(this, &ofApp::diffToggled);
 }
 
 //--------------------------------------------------------------
@@ -125,7 +145,7 @@ void ofApp::draw(){
     if(show_gui){
         exposure_settings.draw();
 
-        string how_to =
+        string how_to = "A LITTLE HELPING HAND\n"
         "Simply select a video source file first, remembering that you\n"
         "can only use either mp4 or mov formats.\n"
         "Now use the sliders to set the exposure time, which is kinda\n"
@@ -136,7 +156,8 @@ void ofApp::draw(){
         "running and check the progress via the information at the\n"
         "bottom left of screen.\n"
         "If you're happy with the result then just hit the spacebar\n"
-        "to save it to a location of your choosing.";
+        "to save it to a location of your choosing then either\n."
+        "run again from where you left the video or load another.";
         ofDrawBitmapString(how_to,13,exposure_settings.getHeight()+30);
     }else{
         timeography->drawInput(true);
