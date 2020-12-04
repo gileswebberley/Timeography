@@ -93,10 +93,10 @@ void ofApp::expGoButtonPressed(){
     if(timeography != nullptr){
         //timeography->clearDifference();
         if(is_diff_mode){
-        /*use for diff style timeograph or comment out for normal mode
+            /*use for diff style timeograph or comment out for normal mode
         ** use up to 120ish for low contrast images, otherwise about 10
 false is bool for outline renedering*/
-        timeography->setupDifference(difference_threshold,false);
+            timeography->setupDifference(difference_threshold,false);
         }else{
             timeography->clearDifference();
         }
@@ -113,8 +113,8 @@ void ofApp::loadVidButtonPressed(){
 void ofApp::diffToggled(bool& val){
     cout<<"Difference Mode is "<<val<<"\n";
     if(val != is_diff_mode){
-    is_diff_mode = val;
-    //if(!val && timeography != nullptr) timeography->clearDifference();
+        is_diff_mode = val;
+        //if(!val && timeography != nullptr) timeography->clearDifference();
     }
 }
 void ofApp::exit(){
@@ -126,12 +126,12 @@ void ofApp::exit(){
 //--------------------------------------------------------------
 void ofApp::update(){
     if(is_exp_go){
-    //shutterRelease returns true whilst it is 'recording'
-    if(!timeography->shutterRelease()){
-        cout<<"ofApp::update shutter release\n";
-        timeography->shutterRelease();
-        is_exp_go = false;
-    }
+        //shutterRelease returns true whilst it is 'recording'
+        if(!timeography->shutterRelease()){
+            cout<<"ofApp::update shutter release\n";
+            timeography->shutterRelease();
+            is_exp_go = false;
+        }
     }
 }
 
@@ -139,28 +139,29 @@ void ofApp::update(){
 void ofApp::draw(){
     //ofSetColor(255);
     if(timeography != nullptr){
-    if(timeography->isReady()){
-        timeography->drawExposure();
-        show_gui = true;
-    }
+        if(timeography->isReady()){
+            timeography->drawExposure();
+            show_gui = true;
+        }
     }
     if(show_gui){
         exposure_settings.draw();
 
         string how_to = "A LITTLE HELPING HAND\n"
-        "Simply select a video source file first, remembering that you\n"
-        "can only use either mp4 or mov formats.\n"
-        "Now use the sliders to set the exposure time, which is kinda\n"
-        "how blurry each 'frame' is, and the frame count, which is how\n"
-        "many exposures are blended into the final Timeograph.\n"
-        "I recommend an exp_t [3..30] and t_frames can be worked out\n"
-        "as (length in secs*30)/exp_t.\n At this point you can set it\n"
-        "running and check the progress via the information at the\n"
-        "bottom left of screen.\n"
-        "If you're happy with the result then just hit the spacebar\n"
-        "to save it to a location of your choosing then either\n."
-        "run again from where you left the video or load another.";
-        ofDrawBitmapString(how_to,13,exposure_settings.getHeight()+30);
+                        "Simply select a video source file first, remembering that you\n"
+                        "can only use either mp4 or mov formats.\n"
+                        "Now use the sliders to set the exposure time, which is kinda\n"
+                        "how blurry each 'frame' is, and the frame count, which is how\n"
+                        "many exposures are blended into the final Timeograph.\n"
+                        "I recommend an exp_t [3..30] and t_frames can be worked out\n"
+                        "as (length in secs*30)/exp_t.\n At this point you can set it\n"
+                        "running and check the progress via the information at the\n"
+                        "bottom left of screen.\n"
+                        "If you're happy with the result then just hit the spacebar\n"
+                        "to save it to a location of your choosing then either\n."
+                        "run again from where you left the video or load another.";
+        //set the position relative to other gui elements..works nicely
+        ofDrawBitmapString(how_to,exposure_settings.getPosition().x,exposure_settings.getPosition().y+exposure_settings.getHeight()+30);
     }else{
         timeography->drawInput(true);
     }
