@@ -146,7 +146,7 @@ void ofApp::draw(){
     }
     if(show_gui){
         exposure_settings.draw();
-
+        //doesn't seem to be a textbox in ofxGui?
         string how_to = "A LITTLE HELPING HAND\n"
                         "Simply select a video source file first, remembering that you\n"
                         "can only use either mp4 or mov formats.\n"
