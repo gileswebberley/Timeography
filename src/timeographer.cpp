@@ -41,7 +41,7 @@ void Timeographer::deleteBuffers()
     delete[] timeoframe;
     delete[] pixIn;
     //++ I think this all needs to become a class heirarchy tbh
-    if(diff_mode || difference_learn) delete[] diffMap;
+    if(diff_has_been) delete[] diffMap;
 }
 
 //bool if checking is required later
@@ -140,12 +140,13 @@ bool Timeographer::saveAsJpeg(string filename)
 {
     if(isReady())
     {
-        ofFileDialogResult saveDirResult = ofSystemLoadDialog("Select a folder to save your Timeograph", true);
+        ofFileDialogResult saveDirResult = ofSystemLoadDialog("Select a folder to save your Timeograph", true, ofFilePath::getUserHomeDir());
         if (saveDirResult.bSuccess){
             filename += " exp_t";
             filename += to_string(exposure_time);
             filename += " exp_c";
             filename += to_string(time_frames);
+            filename += "diff:"+to_string(difference_learn);
             filename += ".jpg";
             cout<<"save file as "<<filename<<"\n";
             //implemented scaling with interpolation
@@ -196,22 +197,29 @@ void Timeographer::setupDifference(int d_t, bool outline)
 {
     //don't want anything happening whilst recording
     if(recording){cerr<<"[error]setupDifference called whilst recording\n"; return;}
+    difference_threshold = (abs(d_t)>255)?255:abs(d_t);
+    if(difference_learn){
+        cerr<<"[error] setUpDifference has already been set up, changing threshold...\n";
+    }
     differenceGrayRgb.allocate(grabW,grabH);
     differenceGray.allocate(grabW,grabH);
     differenceGrayBg.allocate(grabW,grabH);
     differenceGrayAbs.allocate(grabW,grabH);
     //diff map is just black & white
     diffMap = new unsigned char[grabW*grabH];
+    //adding a flag so that this gets cleared up even
+    //if this mode has been switched off during a session
+    diff_has_been = true;
     difference_learn = true;
-    difference_threshold = (abs(d_t)>255)?255:abs(d_t);/*
-    //trying to implement frame by frame
-    vidIn.toggleJog();*/
     do_outline = outline;
 }
 
 bool Timeographer::clearDifference(){
     if(recording) return false;
-    if(diff_mode || difference_learn) delete [] diffMap;
+    //this is making it crash when turning off diff mode
+    //but it feels like this means that it won't clear up
+    //the memory in the destructor?? that's a leak right?
+    //if(diff_mode || difference_learn) delete [] diffMap;
     difference_learn = false;
     diff_mode = false;
     do_outline = false;

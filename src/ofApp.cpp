@@ -14,7 +14,7 @@ void ofApp::setup(){
 
 bool ofApp::openAndCreateFileTimeographer(){
     //make system selection for the video file
-    ofFileDialogResult open_result = ofSystemLoadDialog("Select an mp4 or mov as Timeograph source");
+    ofFileDialogResult open_result = ofSystemLoadDialog("Select an mp4 or mov as Timeograph source",false,ofFilePath::getUserHomeDir());
     if(open_result.bSuccess){
         //if a file was selected
         //cerate ofFile from the selected
@@ -97,6 +97,8 @@ void ofApp::expGoButtonPressed(){
         ** use up to 120ish for low contrast images, otherwise about 10
 false is bool for outline renedering*/
         timeography->setupDifference(difference_threshold,false);
+        }else{
+            timeography->clearDifference();
         }
         timeography->setExposure(exposure_time,exposure_number);
         is_exp_go = true;
@@ -112,7 +114,7 @@ void ofApp::diffToggled(bool& val){
     cout<<"Difference Mode is "<<val<<"\n";
     if(val != is_diff_mode){
     is_diff_mode = val;
-    if(!val && timeography != nullptr) timeography->clearDifference();
+    //if(!val && timeography != nullptr) timeography->clearDifference();
     }
 }
 void ofApp::exit(){
