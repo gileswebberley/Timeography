@@ -4,7 +4,7 @@ Timeographer::Timeographer(string filepath)
 {
     cout<<"timeographer created for playback of "<<filepath<<"\n";
     vidIn.setType(IS_TYPES::VID_FILE);
-    //+needs work, fails on every update somewhere...
+    //done +needs work, fails on every update somewhere...
     if(vidIn.setupInput(filepath, true)){
         //implemented frame by frame (jog) behaviour with true arg
         //I had forgotten this so the buffers were the wrong size...crashed repeatedly
@@ -216,6 +216,7 @@ void Timeographer::setupDifference(int d_t, bool outline)
 
 bool Timeographer::clearDifference(){
     if(recording) return false;
+    //**FIXED with diff_has_been flag
     //this is making it crash when turning off diff mode
     //but it feels like this means that it won't clear up
     //the memory in the destructor?? that's a leak right?
