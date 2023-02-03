@@ -1,2 +1,4 @@
 bin/data/*.mp4
 bin/Timeographer_debug
+obj/
+.vs

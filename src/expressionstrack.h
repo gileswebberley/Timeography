@@ -1,8 +1,8 @@
 #ifndef EXPRESSIONSTRACK_H
 #define EXPRESSIONSTRACK_H
 
-#import "ofxOpenCv.h"
-#import "inputselector2.h"
+#include "ofxOpenCv.h"
+#include "inputselector2.h"
 
 
 class expressionsTrack
