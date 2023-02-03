@@ -12,18 +12,20 @@ Project{
         name: { return FileInfo.baseName(sourceDirectory) }
 
         files: [
-            "src/inputselector2.cpp",
-            "src/inputselector2.h",
-            "src/timeographer.cpp",
-            "src/timeographer.h",
-            "src/main.cpp",
-            "src/ofApp.cpp",
-            "src/ofApp.h",
+            'src/expressionstrack.cpp',
+            'src/expressionstrack.h',
+            'src/inputselector2.cpp',
+            'src/inputselector2.h',
+            'src/main.cpp',
+            'src/ofApp.cpp',
+            'src/ofApp.h',
+            'src/timeographer.cpp',
+            'src/timeographer.h',
         ]
 
         of.addons: [
             'ofxOpenCv',
-            'ofxGui'
+            'ofxGui',
         ]
 
         // additional flags for the project. the of module sets some

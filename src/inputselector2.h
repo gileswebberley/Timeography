@@ -1,6 +1,7 @@
 #ifndef INPUTSELECTOR_H
 #define INPUTSELECTOR_H
 #include "ofMain.h"
+//#include "ofGstVideoPlayer.h"
 
 /*
  * This is the second version, the original is

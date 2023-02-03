@@ -18,6 +18,10 @@ bool InputSelector::setupInput(string filepath, bool jog)
 {
     if(type_flag == IS_TYPES::VID_FILE)
     {
+        //using the gstreamer method to get the jog working reliably (not working)
+//        if(jog) {auto player = std::make_shader<ofGstVideoPlayer>();
+//        player.setFrameByFrame(true);
+//        vidPlayer.setPlayer(player);}
         if(vidPlayer.load(filepath)){
             cout<<"VID_FILE has loaded....\n";
             isWidth = vidPlayer.getWidth();
