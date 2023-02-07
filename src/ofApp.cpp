@@ -25,7 +25,12 @@ bool ofApp::openAndCreateFileTimeographer(){
                 //getBaseName actually gets the name stripped of extension eg "file.jpg"->"file"
                 original_name = tmpFile.getBaseName();
                 cout<<original_name<<" is being set up as source of Timeographer\n";
-                if(timeography != nullptr) timeography = nullptr;
+                if (timeography != nullptr) {
+                    //terrifyingly I think I had introduced a memory leak by not deleting!!
+                    //this should call the destructor to clear up all the buffers
+                    delete timeography;
+                    timeography = nullptr;
+                }
                 //does that clear up?? seems to be working acc. to valgrind check?
                 timeography = new Timeographer{tmpFile.path()};
                 //as it is set to jog it should pause until exposure is set
