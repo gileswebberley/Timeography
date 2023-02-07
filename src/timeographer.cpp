@@ -186,7 +186,7 @@ void Timeographer::drawExposure()
 void Timeographer::drawExposure(int w, int h)
 {
     //ofEnableBlendMode(OF_BLENDMODE_SCREEN);
-    if(timeograph_ready)texOut.draw(0,0,w,h);
+    if(isReady())texOut.draw(0,0,w,h);
     if(info_on) displayInfo();
 }
 

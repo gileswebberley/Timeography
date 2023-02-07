@@ -126,6 +126,8 @@ void ofApp::exit(){
 //--------------------------------------------------------------
 void ofApp::update(){
     if(is_exp_go){
+
+        //cout << "ofApp::update() is_exp_go == true\n";
         //shutterRelease returns true whilst it is 'recording'
         if(!timeography->shutterRelease()){
             cout<<"ofApp::update shutter release\n";
