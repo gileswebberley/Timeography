@@ -138,15 +138,18 @@ bool Timeographer::shutterRelease()
 
 bool Timeographer::saveAsJpeg(string filename)
 {
+    cout << "SaveAsJpeg()";
     if(isReady())
     {
+        cout << "SaveAsJpeg() image isReady()";
         ofFileDialogResult saveDirResult = ofSystemLoadDialog("Select a folder to save your Timeograph", true, ofFilePath::getUserHomeDir());
         if (saveDirResult.bSuccess){
+            cout << "SaveAsJpeg() save directory is"+saveDirResult.filePath;
             filename += " exp_t";
             filename += to_string(exposure_time);
             filename += " exp_c";
             filename += to_string(time_frames);
-            filename += "diff:"+to_string(difference_learn);
+            filename += "diff"+to_string(difference_learn);
             filename += ".jpg";
             cout<<"save file as "<<filename<<"\n";
             //implemented scaling with interpolation
@@ -154,7 +157,7 @@ bool Timeographer::saveAsJpeg(string filename)
             //copy pixels from graphics card to an ofPixels temp variable
             texOut.readToPixels(tmpResize);
             //the ofPixels resize() allows the interpolation argument
-            tmpResize.resize(texOut.getWidth()*2,texOut.getHeight()*2,OF_INTERPOLATE_NEAREST_NEIGHBOR);
+            tmpResize.resize(texOut.getWidth()*2,texOut.getHeight()*2,OF_INTERPOLATE_BICUBIC);
             //then an ofImage to allow for the save()
             photo.setFromPixels(tmpResize);
             //this "/" won't work in windows, is there a way to get a localised version? YES??
