@@ -30,18 +30,19 @@ Timeographer::Timeographer(int w, int h, int device_id)
 Timeographer::~Timeographer()
 {
     deleteBuffers();
+    cout << "Timeographer destructor has run\n";
 }
 
 void Timeographer::deleteBuffers()
 {
     //delete all of the elements and the pointer
     //free up the free store (is there a song about that!??)
-    delete[] buff;
-    delete[] timeograph;
-    delete[] timeoframe;
-    delete[] pixIn;
+    if (buff != NULL) delete[] buff;
+    if (timeograph != NULL) delete[] timeograph;
+    if (timeoframe != NULL) delete[] timeoframe;
+    if(pixIn != NULL) delete[] pixIn;
     //++ I think this all needs to become a class heirarchy tbh
-    if(diff_has_been) delete[] diffMap;
+    if(diff_has_been && diffMap != NULL) delete[] diffMap;
 }
 
 //bool if checking is required later

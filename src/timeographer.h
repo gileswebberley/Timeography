@@ -28,15 +28,15 @@ if it's the same device, collection of object ptrs for the files?*/
     ofImage photo;
     /*buff is the converted version of timeograph that can
     be given to the texOut (char rounded conversion of dbl val)*/
-    unsigned char* buff;
+    unsigned char* buff = nullptr;
     /*the array for the difference map*/
-    unsigned char* diffMap;
+    unsigned char* diffMap = nullptr;
     /*need to make each frame a non-local variable cos of differenceShutter() */
-    const unsigned char* pixIn;
+    const unsigned char* pixIn = nullptr;
     /*essentially each exposure that makes up the timeograph*/
-    double* timeoframe;
+    double* timeoframe = nullptr;
     /*this is the actual data representation of the timeograph*/
-    double* timeograph;
+    double* timeograph = nullptr;
     /*flags to take care of safe running and state awareness*/
     bool timeograph_ready{false}, recording{false}, info_on{true}, difference_learn{false}, diff_mode{false}, do_outline{false}, diff_has_been{false};
     /*default values for the parameters needed*/
