@@ -110,6 +110,7 @@ false is bool for outline renedering*/
         is_exp_go = true;
         show_gui = false;
     }
+    //is_exp_go = true;
 }
 
 void ofApp::loadVidButtonPressed(){
@@ -132,7 +133,7 @@ void ofApp::exit(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    if(is_exp_go){
+    if(is_exp_go && timeography != nullptr){
 
         //cout << "ofApp::update() is_exp_go == true\n";
         //shutterRelease returns true whilst it is 'recording'

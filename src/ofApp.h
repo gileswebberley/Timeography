@@ -21,7 +21,7 @@ class ofApp : public ofBaseApp{
     ofxToggle diff_mode_toggle;
     ofxPanel exposure_settings;
     //flags for flow control
-    bool show_gui{true}, is_exp_go{false}, is_diff_mode{false};
+    bool show_gui{true}, is_exp_go{true}, is_diff_mode{false};
 
     void makeExposureGui();
     bool openAndCreateFileTimeographer();

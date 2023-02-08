@@ -37,12 +37,12 @@ void Timeographer::deleteBuffers()
 {
     //delete all of the elements and the pointer
     //free up the free store (is there a song about that!??)
-    if (buff != NULL) delete[] buff;
-    if (timeograph != NULL) delete[] timeograph;
-    if (timeoframe != NULL) delete[] timeoframe;
-    if(pixIn != NULL) delete[] pixIn;
-    //++ I think this all needs to become a class heirarchy tbh
-    if(diff_has_been && diffMap != NULL) delete[] diffMap;
+    if (buff != nullptr) delete[] buff;
+    if (timeograph != nullptr) delete[] timeograph;
+    if (timeoframe != nullptr) delete[] timeoframe;
+    if(pixIn != nullptr) delete[] pixIn;
+    //++ I think this all needs to become a class heirarchy tbh - just not up to it currently
+    if(diff_has_been && diffMap != nullptr) delete[] diffMap;
 }
 
 //bool if checking is required later
@@ -59,13 +59,16 @@ bool Timeographer::buildBuffers()
     cout<<".";
     pixIn = new  unsigned char[grabW*grabH*3];
     cout<<".buffers built\n";
+    //this has fixed the bug where it doesn't run on the first attempt
+    //essentially we are making a blank image that goes into texOut
+    makeTimeograph();
     return true;
 }
 
 //can't change these whilst it's running
 void Timeographer::setExposure(int exp_t, int t_frames)
 {
-    //lock whilst the 'shutter is open'...
+    //lock whilst the 'shutter is open'...this is not working as expected
     if(recording){cerr<<"[error] setExposure called whilst recording\n";return;}
     //flag that buffers are empty to start with
     timeograph_ready = false;
