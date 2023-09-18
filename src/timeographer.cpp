@@ -133,6 +133,7 @@ bool Timeographer::shutterRelease()
         }
         //we have done our stuff with a new frame
         return true;
+        //or there is no video left!...fix here I think
     }//end if recording
     //we are not recording
     return false;
@@ -260,7 +261,7 @@ void Timeographer::learnDifference()
     diff_mode = true;
     exposure_cnt++;
     differenceGrayBg.setFromPixels(buff,grabW,grabH);
-    differenceGrayBg.blur(3);
+    differenceGrayBg.blur(difference_blur);
 }
 
 //private method - difference mode equivalent to timeExposure()
@@ -279,9 +280,9 @@ void Timeographer::buildDifference()
     //hence the fact we draw from the buffer!!! so painful to work this out
     differenceGrayBg += differenceGray;
     //blur to make it less pixely
-    differenceGray.blur(3);
+    differenceGray.blur(difference_blur);
     //what ISN'T in this frame that is in the last one
-    differenceGrayAbs.absDiff(differenceGray, differenceGrayBg);
+    differenceGrayAbs.absDiff(differenceGrayBg, differenceGray);//swapped these round 05-09-23 to do bird tracking picture - made it work again
     differenceGrayAbs.threshold(difference_threshold);
     //this adds an outline to each render, set in setUpDifference()
     if(do_outline) differenceGrayAbs.erode_3x3();
@@ -386,7 +387,7 @@ void Timeographer::makeTimeograph()
             int indexIn = j*inW+i;
             int rgb = 0;
             while(rgb<3){
-                //create timeograph by rounding from dbl to int
+                //create timeograph by rounding from dbl to int, floor to round down (avoid peaking)
                 buff[indexIn+rgb] = (int)floor(timeograph[indexIn+rgb]);
                 //clear the timeograph and frame data
                 timeoframe[indexIn+rgb] = 0.f;
