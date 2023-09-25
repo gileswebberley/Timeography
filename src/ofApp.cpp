@@ -28,8 +28,8 @@ bool ofApp::openAndCreateFileTimeographer(){
                 if (timeography != nullptr) {
                     //terrifyingly I think I had introduced a memory leak by not deleting!!
                     //this should call the destructor to clear up all the buffers
-                    delete timeography;
                     cout << "TImeographer deleted from OfApp\n";
+                    delete timeography;
                     timeography = nullptr;
                 }
                 //does that clear up?? seems to be working acc. to valgrind check?

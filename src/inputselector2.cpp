@@ -72,7 +72,7 @@ bool InputSelector::setupInput(int w, int h, int deviceId){
         vidGrabber.setVerbose(true);
         vidGrabber.listDevices();
         vidGrabber.setDeviceID(deviceId);
-        if(vidGrabber.initGrabber(w,h)){
+        if(vidGrabber.setup(w,h)){//alternative mentioned in build output as preferred - vidGrabber.setup(w,h) rather than initGrabber(w,h)
             cout<<"VID_DEVICE is initialised...\n";
             isWidth = vidGrabber.getWidth();
             isHeight = vidGrabber.getHeight();

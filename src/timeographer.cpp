@@ -40,7 +40,7 @@ void Timeographer::deleteBuffers()
     if (buff != nullptr) delete[] buff;
     if (timeograph != nullptr) delete[] timeograph;
     if (timeoframe != nullptr) delete[] timeoframe;
-    if(pixIn != nullptr) delete[] pixIn;
+    //if(pixIn != nullptr) delete[] pixIn; - commenting out this stopped the crashing when loading another video after running it already (work out why!!)
     //++ I think this all needs to become a class heirarchy tbh - just not up to it currently
     if(diff_has_been && diffMap != nullptr) delete[] diffMap;
 }
