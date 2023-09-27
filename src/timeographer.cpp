@@ -155,6 +155,7 @@ bool Timeographer::saveAsJpeg(string filename)
             filename += " exp_c";
             filename += to_string(time_frames);
             filename += "diff"+to_string(difference_learn);
+            if (difference_learn)filename += "threshold" + to_string(difference_threshold);
             filename += ".jpg";
             cout<<"save file as "<<filename<<"\n";
             //implemented scaling with interpolation
@@ -167,7 +168,7 @@ bool Timeographer::saveAsJpeg(string filename)
             photo.setFromPixels(tmpResize);
             //this "/" won't work in windows, is there a way to get a localised version? YES??
             string dir_path{ofFilePath::addTrailingSlash(saveDirResult.filePath)};
-            return photo.save(dir_path+filename,OF_IMAGE_QUALITY_HIGH);
+            return photo.save(dir_path+filename,OF_IMAGE_QUALITY_BEST);
         }
     }
     return false;

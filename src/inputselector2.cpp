@@ -23,7 +23,7 @@ bool InputSelector::setupInput(string filepath, bool jog)
 //        player.setFrameByFrame(true);
 //        vidPlayer.setPlayer(player);}
         if(vidPlayer.load(filepath)){
-            cout<<"VID_FILE has loaded....\n";
+            cout<<"VID_FILE has loaded....Total frames = "<< vidPlayer.getTotalNumFrames()<<" \n";
             isWidth = vidPlayer.getWidth();
             isHeight = vidPlayer.getHeight();
             ofSetVerticalSync(true);
@@ -94,14 +94,20 @@ bool InputSelector::updateInput(){
     }
     if(type_flag == IS_TYPES::VID_FILE){
         vidPlayer.update();
+        //cout << "UpdateInput: Frame number: " << vidPlayer.getCurrentFrame() << "\n";
         //didn't loop in jog mode...
-        if(vidPlayer.getIsMovieDone()){
-            vidPlayer.firstFrame();
-        }
+        //if(vidPlayer.getIsMovieDone()){
+        //    vidPlayer.firstFrame();
+        //}
         if(vidPlayer.isFrameNew()){
-            //try to make frame shuttle work in here?
+            //try to make frame shuttle work in here?            
             //ok, so had to pause the video then put this inside the isFrameNew test
             if(is_jog)vidPlayer.nextFrame();
+            //this looping simply never tests as true?? - FIXED with the +1
+            if (vidPlayer.getTotalNumFrames() == vidPlayer.getCurrentFrame()+1) {
+                cout << "MOVIE HAS FINISHED\n\n";
+                vidPlayer.firstFrame();
+            }
             return true;
         }
         return false;
