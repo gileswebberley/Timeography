@@ -40,7 +40,7 @@ if it's the same device, collection of object ptrs for the files?*/
     /*flags to take care of safe running and state awareness*/
     bool timeograph_ready{false}, recording{false}, info_on{true}, difference_learn{false}, diff_mode{false}, do_outline{false}, diff_has_been{false};
     /*default values for the parameters needed*/
-    int grabW{ 640 }, grabH{ 480 }, exposure_time{ 10 }, time_frames{ 30 }, exposure_cnt{ 0 }, timeframe_cnt{ 0 }, difference_threshold{ 10 }, difference_blur{ 3 };
+    int grabW{ 640 }, grabH{ 480 }, exposure_time{ 10 }, time_frames{ 30 }, exposure_cnt{ 0 }, timeframe_cnt{ 0 }, difference_threshold{ 10 }, difference_blur{ 3 }, max_exp_t{ 3000 }, max_t_frames{ 3000 };
 
     /*create all of the pixel arrays and texture the
     size of the input (got to be careful not to go

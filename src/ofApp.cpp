@@ -83,9 +83,9 @@ void ofApp::makeExposureGui(){
     diff_mode_toggle.setTextColor(bgtc);
     exposure_settings.add(load_video_button.setup("Click to select input file (MP4 or MOV only)"));
     exposure_settings.add(diff_mode_toggle.setup("Set to use Difference Mode",false));
-    exposure_settings.add(difference_threshold.setup("Difference (set high for low contrast)",10,1,200));
-    exposure_settings.add(exposure_time.setup("EXPOSURE TIME (blur 30 = 1sec)",30,1,300,300));
-    exposure_settings.add(exposure_number.setup("FRAME COUNT (blend exposures)",10,1,1000));
+    exposure_settings.add(difference_threshold.setup("Difference (set high for low contrast)",10,1,254));
+    exposure_settings.add(exposure_time.setup("EXPOSURE TIME (blur 30 = 1sec)",30,1,3000,300));
+    exposure_settings.add(exposure_number.setup("FRAME COUNT (blend exposures)",10,1,3000));
     exposure_settings.add(exposure_go_button.setup("Click the box to Run Timeographer"));
 }
 

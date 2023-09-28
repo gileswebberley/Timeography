@@ -4,7 +4,6 @@ Timeographer::Timeographer(string filepath)
 {
     cout<<"timeographer created for playback of "<<filepath<<"\n";
     vidIn.setType(IS_TYPES::VID_FILE);
-    //done +needs work, fails on every update somewhere...
     if(vidIn.setupInput(filepath, true)){
         //implemented frame by frame (jog) behaviour with true arg
         //I had forgotten this so the buffers were the wrong size...crashed repeatedly
@@ -41,8 +40,9 @@ void Timeographer::deleteBuffers()
     if (timeograph != nullptr) delete[] timeograph;
     if (timeoframe != nullptr) delete[] timeoframe;
     //if(pixIn != nullptr) delete[] pixIn; - commenting out this stopped the crashing when loading another video after running it already (work out why!!)
+    // I think it may be a const pointer so perhaps clear() or it seems like it looks after itself from video player
     //++ I think this all needs to become a class heirarchy tbh - just not up to it currently
-    if(diff_has_been && diffMap != nullptr) delete[] diffMap;
+    if(diff_has_been && diffMap != nullptr) delete[] diffMap;//this seems to be causing a crash when reloading video with diff mode switched on
 }
 
 //bool if checking is required later
@@ -57,7 +57,7 @@ bool Timeographer::buildBuffers()
     cout<<".";
     timeoframe = new double[grabW*grabH*3];
     cout<<".";
-    pixIn = new  unsigned char[grabW*grabH*3];
+    pixIn = new unsigned char[grabW*grabH*3];
     cout<<".buffers built\n";
     //this has fixed the bug where it doesn't run on the first attempt
     //essentially we are making a blank image that goes into texOut
@@ -77,8 +77,8 @@ void Timeographer::setExposure(int exp_t, int t_frames)
      * it a ridiculous task but want to capture decent
      * amounts of time...
      */
-    exp_t = (abs(exp_t)>300)?300:abs(exp_t);//10secs @ 30fps
-    t_frames = (abs(t_frames)>1000)?1000:abs(t_frames);//166mins (2hrs 46mins) @ 300exp_t
+    exp_t = (abs(exp_t)>max_exp_t)?max_exp_t:abs(exp_t);//100secs @ 30fps
+    t_frames = (abs(t_frames)>max_t_frames)?max_t_frames:abs(t_frames);//166mins (2hrs 46mins) @ 300exp_t
     exposure_time = exp_t;
     time_frames = t_frames;
     cout<<"Exposure set: exposure time: "<<exposure_time<<"\ttime frames: "<<time_frames<<"\n";
@@ -281,7 +281,7 @@ void Timeographer::buildDifference()
     //hence the fact we draw from the buffer!!! so painful to work this out
     differenceGrayBg += differenceGray;
     //blur to make it less pixely
-    differenceGray.blur(difference_blur);
+    //differenceGray.blur(difference_blur);
     //what ISN'T in this frame that is in the last one
     differenceGrayAbs.absDiff(differenceGrayBg, differenceGray);//swapped these round 05-09-23 to do bird tracking picture - made it work again
     differenceGrayAbs.threshold(difference_threshold);
@@ -361,14 +361,14 @@ void Timeographer::makeFrame()
                 //timeograph[indexIn+rgb] += comp/time_frames;
                 if(comp > 0.0){
                 //adding long exposure to timeograph
-                //timeograph[indexIn+rgb] += (double)timeoframe[indexIn+rgb]/(time_frames);
-                //try to soften the effect
-                timeograph[indexIn+rgb] += (double)comp/(time_frames);
+                timeograph[indexIn+rgb] += (double)timeoframe[indexIn+rgb]/(time_frames);
+                //try to soften the effect - makes the exposure a bit drab
+                //timeograph[indexIn+rgb] += (double)comp/(time_frames);
                 }else{
                     //subtracting long exposure to timeograph
-                    //timeograph[indexIn+rgb] -= (double)timeoframe[indexIn+rgb]/(time_frames);
+                    timeograph[indexIn+rgb] -= (double)timeoframe[indexIn+rgb]/(time_frames);
                     //try to soften the effect
-                    timeograph[indexIn+rgb] -= (double)abs(comp)/(time_frames);
+                    //timeograph[indexIn+rgb] -= (double)abs(comp)/(time_frames);
                 }
                 //clear the long exposure
                 timeoframe[indexIn+rgb] = 0.f;
