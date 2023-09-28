@@ -116,7 +116,8 @@ bool InputSelector::updateInput(){
     return false;
 }
 
-const ofPixels& InputSelector::getPixelRead()
+//const ofPixels& InputSelector::getPixelRead()
+ofPixels& InputSelector::getPixelRead()
 {
     if(type_flag == IS_TYPES::VID_DEVICE){
         if(vidGrabber.isFrameNew()){

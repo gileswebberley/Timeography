@@ -54,8 +54,9 @@ public:
     bool setupInput(int w, int h, int deviceId=0);
     //call the update() on our IS_TYPE or moves to next frame
     bool updateInput();
-    //read the pixels that have been updated
-    const ofPixels& getPixelRead();
+    //read the pixels that have been updated - not sure why I made it const but it's causing me trouble in using it :(
+    //const ofPixels& getPixelRead();
+    ofPixels& getPixelRead();
     //for video players + grabbers
     void drawInput();
     //+new s is whether to scale the video to the window's width

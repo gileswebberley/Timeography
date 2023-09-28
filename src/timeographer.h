@@ -32,7 +32,8 @@ if it's the same device, collection of object ptrs for the files?*/
     /*the array for the difference map*/
     unsigned char* diffMap = nullptr;
     /*need to make each frame a non-local variable cos of differenceShutter() */
-    const unsigned char* pixIn = nullptr;
+    //const unsigned char* pixIn = nullptr; //going to convert to an ofPixels object
+    ofPixels pixIn;
     /*essentially each exposure that makes up the timeograph*/
     double* timeoframe = nullptr;
     /*this is the actual data representation of the timeograph*/

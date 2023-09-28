@@ -39,10 +39,12 @@ void Timeographer::deleteBuffers()
     if (buff != nullptr) delete[] buff;
     if (timeograph != nullptr) delete[] timeograph;
     if (timeoframe != nullptr) delete[] timeoframe;
+    if (texOut.isAllocated()) texOut.clear();
+    if (pixIn.isAllocated()) pixIn.clear();
     //if(pixIn != nullptr) delete[] pixIn; - commenting out this stopped the crashing when loading another video after running it already (work out why!!)
     // I think it may be a const pointer so perhaps clear() or it seems like it looks after itself from video player
     //++ I think this all needs to become a class heirarchy tbh - just not up to it currently
-    if(diff_has_been && diffMap != nullptr) delete[] diffMap;//this seems to be causing a crash when reloading video with diff mode switched on
+    if(diff_has_been && diffMap != nullptr) delete[] diffMap ;//this seems to be causing a crash when reloading video with diff mode switched on
 }
 
 //bool if checking is required later
@@ -57,7 +59,9 @@ bool Timeographer::buildBuffers()
     cout<<".";
     timeoframe = new double[grabW*grabH*3];
     cout<<".";
-    pixIn = new unsigned char[grabW*grabH*3];
+    //pixIn = new unsigned char[grabW*grabH*3];
+    //converting to an ofPixels object
+    pixIn.allocate(grabW, grabH, GL_RGB);
     cout<<".buffers built\n";
     //this has fixed the bug where it doesn't run on the first attempt
     //essentially we are making a blank image that goes into texOut
@@ -239,9 +243,10 @@ bool Timeographer::clearDifference(){
 //private method for the first frame whilst in difference mode
 void Timeographer::learnDifference()
 {
-    pixIn = vidIn.getPixelRead().getData();
+    pixIn = vidIn.getPixelRead();//.getData();
     int inW = vidIn.getWidth();//belt & braces, could be grabW
     int inH = vidIn.getHeight();
+    //char channels[3] = { 'r','g','b' };
     for(int j=0;j<inH*3; j+=3){
         for(int i=0;i<inW*3;i+=3){
             int indexIn = j*inW+i;
@@ -249,7 +254,7 @@ void Timeographer::learnDifference()
             int rgb = 0;
             while(rgb<3){
                 //set image as original frame
-                timeoframe[indexIn+rgb] = buff[indexIn+rgb] = pixIn[indexIn+rgb];
+                timeoframe[indexIn + rgb] = buff[indexIn + rgb] = (double)pixIn[indexIn+rgb];
                 //why have I left this in the loop??
 //                difference_learn = false;
 //                diff_mode = true;
@@ -274,7 +279,7 @@ void Timeographer::buildDifference()
 */
     differenceGrayRgb.setFromPixels(vidIn.getPixelRead());
     //make sure we're looking at the same frame as is being compared for change
-    pixIn = differenceGrayRgb.getPixels().getData();
+    pixIn = differenceGrayRgb.getPixels();//.getData();
     //gray version of the new frame
     differenceGray = differenceGrayRgb;
     //THIS!! this is how to look at what was in the last frame
@@ -312,7 +317,7 @@ void Timeographer::buildDifference()
             }else{
                 while(rgb<3){
                     //YES!! fuckin done it, can't believe it took so long!!
-                buff[indexIn+rgb] = pixIn[indexIn+rgb];
+                    buff[indexIn + rgb] = pixIn[indexIn + rgb];//pixIn.getColor(indexIn)[rgb];
                 rgb++;
                 }
             }
@@ -326,7 +331,7 @@ void Timeographer::timeExposure()
     //cout<<"timeExposure....\n";
     //copied from ofBook but had to add .getData()!??
     //getData returns a ptr to the underlying char[]*/
-    pixIn = vidIn.getPixelRead().getData();
+    pixIn = vidIn.getPixelRead();//.getData();
     int inW = grabW;
     int inH = grabH;
     for(int j=0;j<inH*3; j+=3){
