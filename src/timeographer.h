@@ -20,6 +20,8 @@ if it's the same device, collection of object ptrs for the files?*/
     ofxCvGrayscaleImage differenceGray;
     ofxCvGrayscaleImage differenceGrayBg;
     ofxCvGrayscaleImage differenceGrayAbs;
+    //this is to try to improve the diff behaviour by not changing the pixels that were different on the previous frame
+    ofxCvGrayscaleImage previousDifferenceGrayAbs;
     //using input selector to look after file/device
     InputSelector vidIn{IS_TYPES::VID_FILE};
     //always the current timeograph
@@ -29,9 +31,9 @@ if it's the same device, collection of object ptrs for the files?*/
     /*buff is the converted version of timeograph that can
     be given to the texOut (char rounded conversion of dbl val)*/
     unsigned char* buff = nullptr;
-    /*the array for the difference map*/
-    unsigned char* diffMap = nullptr;
-    /*need to make each frame a non-local variable cos of differenceShutter() */
+    /*the array for the difference map going to convert to an ofPixels object instead for the in built memory management
+    unsigned char* diffMap = nullptr;*/
+    ofPixels diffMap, previousDiffMap;
     //const unsigned char* pixIn = nullptr; //going to convert to an ofPixels object
     ofPixels pixIn;
     /*essentially each exposure that makes up the timeograph*/
@@ -41,7 +43,7 @@ if it's the same device, collection of object ptrs for the files?*/
     /*flags to take care of safe running and state awareness*/
     bool timeograph_ready{false}, recording{false}, info_on{true}, difference_learn{false}, diff_mode{false}, do_outline{false}, diff_has_been{false};
     /*default values for the parameters needed*/
-    int grabW{ 640 }, grabH{ 480 }, exposure_time{ 10 }, time_frames{ 30 }, exposure_cnt{ 0 }, timeframe_cnt{ 0 }, difference_threshold{ 10 }, difference_blur{ 3 }, max_exp_t{ 3000 }, max_t_frames{ 3000 };
+    int grabW{ 640 }, grabH{ 480 }, exposure_time{ 10 }, time_frames{ 30 }, exposure_cnt{ 0 }, timeframe_cnt{ 0 }, difference_threshold{ 10 }, difference_blur{ 100 }, max_exp_t{ 3000 }, max_t_frames{ 3000 };
 
     /*create all of the pixel arrays and texture the
     size of the input (got to be careful not to go

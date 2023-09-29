@@ -41,10 +41,11 @@ void Timeographer::deleteBuffers()
     if (timeoframe != nullptr) delete[] timeoframe;
     if (texOut.isAllocated()) texOut.clear();
     if (pixIn.isAllocated()) pixIn.clear();
+    if (diffMap.isAllocated()) diffMap.clear();
     //if(pixIn != nullptr) delete[] pixIn; - commenting out this stopped the crashing when loading another video after running it already (work out why!!)
     // I think it may be a const pointer so perhaps clear() or it seems like it looks after itself from video player
     //++ I think this all needs to become a class heirarchy tbh - just not up to it currently
-    if(diff_has_been && diffMap != nullptr) delete[] diffMap ;//this seems to be causing a crash when reloading video with diff mode switched on
+    //if(diff_has_been && diffMap != nullptr) diffMap = nullptr ;//this seems to be causing a crash when reloading video with diff mode switched on
 }
 
 //bool if checking is required later
@@ -218,8 +219,10 @@ void Timeographer::setupDifference(int d_t, bool outline)
     differenceGray.allocate(grabW,grabH);
     differenceGrayBg.allocate(grabW,grabH);
     differenceGrayAbs.allocate(grabW,grabH);
+    //adding in the last frames difference mask
+    previousDifferenceGrayAbs.allocate(grabW, grabH);
     //diff map is just black & white
-    diffMap = new unsigned char[grabW*grabH];
+    diffMap.allocate(grabW,grabH,OF_IMAGE_GRAYSCALE);
     //adding a flag so that this gets cleared up even
     //if this mode has been switched off during a session
     diff_has_been = true;
@@ -267,7 +270,9 @@ void Timeographer::learnDifference()
     diff_mode = true;
     exposure_cnt++;
     differenceGrayBg.setFromPixels(buff,grabW,grabH);
-    differenceGrayBg.blur(difference_blur);
+    //differenceGrayBg.blur(difference_blur);
+    //trying to look after the first frame using the previous abs image - hmm docs say value of 1.0-255.0 but I'm testing for 0 
+    differenceGrayAbs.set(0.0f);
 }
 
 //private method - difference mode equivalent to timeExposure()
@@ -282,20 +287,30 @@ void Timeographer::buildDifference()
     pixIn = differenceGrayRgb.getPixels();//.getData();
     //gray version of the new frame
     differenceGray = differenceGrayRgb;
+    //see if this helps with the detection - nope
+    //differenceGray.contrastStretch();
     //THIS!! this is how to look at what was in the last frame
     //hence the fact we draw from the buffer!!! so painful to work this out
     differenceGrayBg += differenceGray;
     //blur to make it less pixely
     //differenceGray.blur(difference_blur);
+    //this is an attempt to make the trails nicer by not overwritting what has already been written to in total!??
+    previousDifferenceGrayAbs += differenceGrayAbs;
+    previousDiffMap = previousDifferenceGrayAbs.getPixels();
+    //previous frame's mask - see what happens with the first frame, maybe make it black in the setup?
+    //previousDiffMap = differenceGrayAbs.getPixels();
     //what ISN'T in this frame that is in the last one
     differenceGrayAbs.absDiff(differenceGrayBg, differenceGray);//swapped these round 05-09-23 to do bird tracking picture - made it work again
     differenceGrayAbs.threshold(difference_threshold);
     //this adds an outline to each render, set in setUpDifference()
     if(do_outline) differenceGrayAbs.erode_3x3();
+    //try moving the blur onto this image as it's kinda the mask - nah
+    //differenceGrayAbs.dilate();
+    //differenceGrayAbs.blur(difference_blur);
     //set the raw array to reflect the processed absolute difference
-    diffMap = differenceGrayAbs.getPixels().getData();
+    diffMap = differenceGrayAbs.getPixels();
     //#1...better creation of white birds
-    differenceGrayBg = differenceGray;
+    //differenceGrayBg = differenceGray;
 
     int inW = grabW;
     int inH = grabH;
@@ -305,7 +320,7 @@ void Timeographer::buildDifference()
             int grayIndex = (j/3)*inW+(i/3);
             int rgb = 0;
             //if it's black then it hasn't changed
-            if(diffMap[grayIndex] == 0){
+            if(diffMap[grayIndex] == 0 || previousDiffMap[grayIndex] >= 1){
             while(rgb<3){
                 //YES!! setting from what WAS there last time
                 timeoframe[indexIn+rgb] =  buff[indexIn+rgb];
@@ -313,11 +328,12 @@ void Timeographer::buildDifference()
                 ++rgb;
             }
             //else it's white so has changed, therefore store
-            //the changes in the buffer array
-            }else{
+            //the changes in the buffer array - added if it changed last time/before don't overwrite
+            }else if(diffMap[grayIndex] >= 1 && previousDiffMap[grayIndex] == 0){
                 while(rgb<3){
                     //YES!! fuckin done it, can't believe it took so long!!
-                    buff[indexIn + rgb] = pixIn[indexIn + rgb];//pixIn.getColor(indexIn)[rgb];
+                    buff[indexIn + rgb] = pixIn[indexIn + rgb];
+                    timeoframe[indexIn + rgb] = buff[indexIn + rgb];
                 rgb++;
                 }
             }
@@ -326,11 +342,13 @@ void Timeographer::buildDifference()
     exposure_cnt++;
 }
 
+//this is the equivalent of a traditional long exposure in camera
 void Timeographer::timeExposure()
 {
     //cout<<"timeExposure....\n";
     //copied from ofBook but had to add .getData()!??
     //getData returns a ptr to the underlying char[]*/
+    //now changed to ofPixels for stability
     pixIn = vidIn.getPixelRead();//.getData();
     int inW = grabW;
     int inH = grabH;
@@ -340,7 +358,7 @@ void Timeographer::timeExposure()
             int rgb = 0;
             while(rgb<3){
                 //creating long exposure...
-                //posterising fixed with double cast cos it's an int/int
+                //posterising fixed with double cast cos it's char/int
                 timeoframe[indexIn+rgb] += (double)pixIn[indexIn+rgb]/(exposure_time);
                 rgb++;
             }
@@ -349,6 +367,7 @@ void Timeographer::timeExposure()
     exposure_cnt++;
 }
 
+//This is the timeograph style exposure, where shadow has an effect within 'exposed' areas of the frame
 void Timeographer::makeFrame()
 {
     int inW = grabW;
@@ -362,18 +381,16 @@ void Timeographer::makeFrame()
                 //the highlights....
                 //gonna try removing and adding??
                 double nVal = timeoframe[indexIn+rgb];
-                double comp = nVal - timeograph[indexIn+rgb];
+                //as timeograph is slowly built up from tiny exposures we have to adjust the new frame so that it is at
+                //the equivalent point of exposure to compare, this makes the whole point of it work a bit better
+                double comp = (nVal/time_frames) - timeograph[indexIn + rgb]/timeframe_cnt;
                 //timeograph[indexIn+rgb] += comp/time_frames;
-                if(comp > 0.0){
-                //adding long exposure to timeograph
-                timeograph[indexIn+rgb] += (double)timeoframe[indexIn+rgb]/(time_frames);
-                //try to soften the effect - makes the exposure a bit drab
-                //timeograph[indexIn+rgb] += (double)comp/(time_frames);
+                if(comp > 0.0 || diff_mode){//think it was making the image a negative when in diff mode
+                    //adding long exposure to timeograph
+                    timeograph[indexIn+rgb] += (double)nVal/(time_frames);
                 }else{
-                    //subtracting long exposure to timeograph
-                    timeograph[indexIn+rgb] -= (double)timeoframe[indexIn+rgb]/(time_frames);
-                    //try to soften the effect
-                    //timeograph[indexIn+rgb] -= (double)abs(comp)/(time_frames);
+                    //subtracting long exposure to timeograph 
+                    timeograph[indexIn + rgb] -= (double)nVal / time_frames;//abs(comp)/(time_frames);
                 }
                 //clear the long exposure
                 timeoframe[indexIn+rgb] = 0.f;
