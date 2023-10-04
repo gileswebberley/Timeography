@@ -63,6 +63,8 @@ if it's the same device, collection of object ptrs for the files?*/
     void makeFrame();
     //assemble the time frames into the final image
     void makeTimeograph();
+    //little utility to keep values within 0.0 - 255.0
+    double clampBounds(double in);
 
 public:
     /*this was causing some trouble so I withdrew it

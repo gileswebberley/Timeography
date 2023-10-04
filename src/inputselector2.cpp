@@ -103,7 +103,7 @@ bool InputSelector::updateInput(){
             //try to make frame shuttle work in here?            
             //ok, so had to pause the video then put this inside the isFrameNew test
             if(is_jog)vidPlayer.nextFrame();
-            //this looping simply never tests as true?? - FIXED with the +1
+            //this looping simply never tests as true?? - FIXED with the +1 - does not work with QuickTime
             if (vidPlayer.getTotalNumFrames() == vidPlayer.getCurrentFrame()+1) {
                 cout << "MOVIE HAS FINISHED\n\n";
                 vidPlayer.firstFrame();

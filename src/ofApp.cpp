@@ -32,7 +32,7 @@ bool ofApp::openAndCreateFileTimeographer(){
                     delete timeography;
                     timeography = nullptr;
                 }
-                //does that clear up?? seems to be working acc. to valgrind check?
+                //everything seems ok so go ahead and build the new Timeographer
                 timeography = new Timeographer{tmpFile.path()};
                 //as it is set to jog it should pause until exposure is set
 
@@ -99,9 +99,9 @@ void ofApp::expGoButtonPressed(){
     if(timeography != nullptr){
         //timeography->clearDifference();
         if(is_diff_mode){
-            /*use for diff style timeograph or comment out for normal mode
+        /*use for diff style timeograph or comment out for normal mode
         ** use up to 120ish for low contrast images, otherwise about 10
-false is bool for outline renedering*/
+        false is bool for outline renedering*/
             timeography->setupDifference(difference_threshold,false);
         }else{
             timeography->clearDifference();
@@ -110,7 +110,6 @@ false is bool for outline renedering*/
         is_exp_go = true;
         show_gui = false;
     }
-    //is_exp_go = true;
 }
 
 void ofApp::loadVidButtonPressed(){
